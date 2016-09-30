@@ -21,7 +21,7 @@ class jinteki::users {
     ensure => directory,
     owner => 'jinteki',
     group => 'jinteki',
-    mode => '0750',
+    mode => '0755',
     require => [User['jinteki'], Group['jinteki']],
   }
 
@@ -45,7 +45,7 @@ class jinteki::users {
       ensure => directory,
       owner => $developer,
       group => 'jinteki',
-      mode => '0750',
+      mode => '0755',
       require => User[$developer],
     }
 
@@ -53,7 +53,7 @@ class jinteki::users {
       source => "puppet:///modules/jinteki/ssh_keys/${developer}.pub",
       owner => $developer,
       group => 'jinteki',
-      mode => '0640',
+      mode => '0644',
       require => File["/home/${developer}/.ssh"],
     }
   }

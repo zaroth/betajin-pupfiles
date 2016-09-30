@@ -1,0 +1,10 @@
+{
+  "name": "jinteki-console",
+  "version": "0.1",
+  "author": "zaroth",
+  "summary": "Collection of console tools and their configs for Jinteki server.",
+  "source":"",
+  "license":"WTFPL",
+  "dependencies":[
+  ]
+}

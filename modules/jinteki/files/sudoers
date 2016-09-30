@@ -1,0 +1,10 @@
+Defaults rootpw
+
+root ALL=(ALL) ALL
+
+%wheel ALL=(ALL) ALL
+
+%jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl restart mongodb.service
+%jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl stop mongodb.service
+%jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl start mongodb.service
+%jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl status mongodb.service

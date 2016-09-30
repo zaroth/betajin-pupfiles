@@ -1,0 +1,10 @@
+{
+  "name": "jinteki-base",
+  "version": "0.1",
+  "author": "zaroth",
+  "summary": "Base system settings for jinteki.net",
+  "source":"",
+  "license":"WTFPL",
+  "dependencies":[
+  ]
+}

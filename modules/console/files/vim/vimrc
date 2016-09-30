@@ -1,0 +1,137 @@
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+set history=100 " keep 50 lines of command line history
+set undolevels=200
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set incsearch		" do incremental searching
+set autoindent
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+" let &guioptions = substitute(&guioptions, "t", "", "g")
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+"------------------------------------------------------------------------------
+"" Function keys.
+"------------------------------------------------------------------------------
+"
+" F1: disable hl temporarily 
+nmap <silent> <F1> :silent noh<CR>
+" C-F1: Toggle hlsearch (highlight search matches).
+"TODO: doesn't work
+nmap <silent> <C-F1> :silent set hls!<CR> 
+
+" F3: Toggle expansion of tabs to spaces.
+" nmap <F3> :set expandtab!<CR>
+
+" F4: Toggle list (display unprintable characters).
+nnoremap <F4> :set list!<CR>
+
+" F5: Insert current date.
+map <F5> :r !date<CR>
+
+" F6: toggle paste mode
+map <F6> :set paste!<CR>
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" In many terminal emulators the mouse works just fine, thus enable it.
+if has('mouse')
+  set mouse=a
+endif
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+" Default indent
+set softtabstop=2 " TAB indent
+set tabstop=2
+set shiftwidth=2 " > indent
+set expandtab
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Enable file type detection.
+  " Use the default filetype settings, so that mail gets 'tw' set to 72,
+  " 'cindent' is on in C files, etc.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  " Also don't do it when the mark is in the first line, that is the default
+  " position when opening a file.
+  autocmd BufReadPost * 
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
+
+  augroup END
+
+  augroup cpp
+    autocmd BufReadPre,FileReadPre      *.cpp,*.hpp,*.cc,*.h set tabstop=2
+    autocmd BufReadPre,FileReadPre      *.cpp,*.hpp,*.cc,*.h set expandtab
+    autocmd BufReadPost	                *.cpp,*.hpp,*.cc,*.h set syntax=cpp.doxygen
+  augroup END
+
+  augroup pythonfiles
+    autocmd BufReadPre,FileReadPre	*.py set expandtab|set tabstop=4|set shiftwidth=4|set expandtab|set softtabstop=4
+  augroup END
+  
+  augroup arff
+    autocmd BufReadPost	                *.arff set syntax=arff
+  augroup END
+
+else
+
+  set autoindent 		" always set autoindenting on
+
+endif " has("autocmd")
+
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
+
+set nu " enable line numbering
+set ignorecase smartcase " ignore case while searching
+set nobackup
+let php_sql_query = 1 " SQL syntax coloring inside strings
+let php_htmlInStrings = 1 " SQL syntax coloring inside strings
+let use_xhtml = 1 " XHTML
+set encoding=utf-8 
+set fileencoding=utf-8 
+set termencoding=utf-8 
+set noerrorbells " No beeps.
+set esckeys " Cursor keys in insert mode.
+set listchars=tab:>-,trail:_,eol:$ " characters to show in place of indentation, eol, etc.
+command! Gcc !gcc % -o %.out
+command! Run !./%.out
+colorscheme elflord
+filetype plugin on
+set grepprg=grep\ -nH\ $*

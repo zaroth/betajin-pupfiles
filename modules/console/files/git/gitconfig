@@ -1,0 +1,10 @@
+[color]
+  ui = auto
+[core]
+  editor = vim
+[http]
+  sslVerify = false
+[pull]
+  rebase = true
+[push]
+  default = matching

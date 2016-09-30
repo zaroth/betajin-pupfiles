@@ -1,0 +1,6 @@
+.directory
+*.gen.pp
+*.swp
+private
+this.manifest
+modules_ext/*

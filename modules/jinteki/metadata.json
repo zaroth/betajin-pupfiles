@@ -1,0 +1,10 @@
+{
+  "name": "jinteki-main",
+  "version": "0.1",
+  "author": "zaroth",
+  "summary": "Main config for Jinteki server.",
+  "source":"",
+  "license":"WTFPL",
+  "dependencies":[
+  ]
+}

@@ -6,12 +6,14 @@ class jinteki {
 
   include jinteki::clojure
   include jinteki::game
+  include jinteki::lighttpd
   include jinteki::mongodb
   include jinteki::nodejs
   include jinteki::scripts
   include jinteki::users
 
   Class[jinteki::users]
+  -> Class[jinteki::lighttpd]
   -> Class[jinteki::nodejs]
   -> Class[jinteki::mongodb]
   -> Class[jinteki::clojure]

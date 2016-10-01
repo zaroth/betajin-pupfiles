@@ -17,7 +17,7 @@ class jinteki::users {
     gid => 'jinteki',
   }
 
-  file {"${jinteki::rootdir}":
+  file {["${jinteki::rootdir}", "${jinteki::logdir}"]:
     ensure => directory,
     owner => 'jinteki',
     group => 'jinteki',

@@ -4,6 +4,8 @@ root ALL=(ALL) ALL
 
 %wheel ALL=(ALL) ALL
 
+%jinteki ALL=(jinteki) NOPASSWD: /usr/local/bin/rebuild.sh
+
 %jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl restart mongodb.service
 %jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl stop mongodb.service
 %jinteki ALL=(root) NOPASSWD: /usr/bin/systemctl start mongodb.service

@@ -12,6 +12,11 @@ LOG_DIR="${ROOT_DIR}/logs"
 LOG_FILE="${LOG_DIR}/$(date +%Y%m%d_%H%M)_build.log"
 START_TIME=`date +%s`
 
+# for commands that don't respect the "no colors in piped output" rule
+function stripcolors {
+  sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g'
+}
+
 function logmsg {
   echo "${1}"
   echo -en "\n\n${1}\n\n" >> $LOG_FILE
@@ -35,10 +40,10 @@ logmsg "Cleaning up previous build..."
 lein clean &>> $LOG_FILE
 
 logmsg "Compiling Stylus files..."
-stylus src/css/ -o resources/public/css/ &>> $LOG_FILE
+stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors >> $LOG_FILE
 
-logmsg "Compiling Clojurescript..."
-lein cljsbuild once prod &>> $LOG_FILE
+logmsg "Compiling ClojureScript..."
+lein cljsbuild once prod 2>&1 | stripcolors >> $LOG_FILE
 
 logmsg "Compiling Clojure..."
 lein uberjar &>> $LOG_FILE

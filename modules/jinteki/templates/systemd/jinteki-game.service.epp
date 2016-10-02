@@ -1,0 +1,14 @@
+[Unit]
+Description=Game server for Jinteki
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/java -jar target/netrunner-0.1.0-SNAPSHOT-standalone.jar
+PrivateDevices=yes
+User=jinteki
+WorkingDirectory=<%= "${jinteki::repodir}" %>
+
+[Install]
+WantedBy=multi-user.target
+

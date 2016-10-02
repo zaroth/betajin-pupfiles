@@ -28,10 +28,10 @@ logmsg "Pulling fresh changes from GitHub..."
 git fetch &>> $LOG_FILE
 NEW_COMMITS=`git rev-list HEAD...origin/dev --count`
 
-if (( $NEW_COMMITS == 0 )); do
+if (( $NEW_COMMITS == 0 )); then
   logmsg "No new commits in GitHub dev branch, exiting."
   exit 0
-done
+fi
 
 git pull origin dev &>> $LOG_FILE
 

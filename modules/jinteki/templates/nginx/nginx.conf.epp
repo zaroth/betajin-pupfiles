@@ -13,10 +13,11 @@ http {
   default_type application/octet-stream;
   client_max_body_size 100M;
   gzip on;
+  charset utf-8;
 
   server {
     listen 80 default_server;
-    server_name jinteki.zaroth.net;
+    server_name jinteki.zaroth.net ws.jinteki.zaroth.net ws.zaroth.net;
     keepalive_timeout 90s;
     location / {
       proxy_pass http://127.0.0.1:1042;

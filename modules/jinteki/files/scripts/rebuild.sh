@@ -9,7 +9,7 @@ ROOT_DIR='/opt/jinteki'
 REPO_DIR="${ROOT_DIR}/netrunner"
 LOG_DIR="${ROOT_DIR}/logs"
 
-LOG_FILE="${LOG_DIR}/$(date +%Y%m%d_%H%M)_build.log"
+LOG_FILE="${LOG_DIR}/$(date +%Y%m%d_%H%M)_build_log.txt"
 START_TIME=`date +%s`
 
 # for commands that don't respect the "no colors in piped output" rule
@@ -25,6 +25,14 @@ function logmsg {
 cd $REPO_DIR
 
 logmsg "Pulling fresh changes from GitHub..."
+git fetch &>> $LOG_FILE
+NEW_COMMITS=`git rev-list HEAD...origin/dev --count`
+
+if (( $NEW_COMMITS == 0 )); do
+  logmsg "No new commits in GitHub dev branch, exiting."
+  exit 0
+done
+
 git pull origin dev &>> $LOG_FILE
 
 logmsg "Updating npm packages..."
@@ -50,5 +58,10 @@ lein cljsbuild once prod 2>&1 | stripcolors >> $LOG_FILE
 logmsg "Compiling Clojure..."
 lein uberjar &>> $LOG_FILE
 
+logmsg "Restarting servers..."
+sudo systemctl restart jinteki-site.service
+sudo systemctl restart jinteki-game.service
+
 let TIME_TAKEN=(`date +%s`-$START_TIME)
 logmsg "Build finished at $(date) in ${TIME_TAKEN} seconds"
+exit 0

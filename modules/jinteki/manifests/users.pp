@@ -13,7 +13,7 @@ class jinteki::users {
     home => "${jinteki::rootdir}",
     managehome => false,
     system => true,
-    shell => '/usr/bin/nologin',
+    shell => '/usr/bin/bash',
     gid => 'jinteki',
   }
 
@@ -27,6 +27,7 @@ class jinteki::users {
 
   $developers = [
     'saintis',
+    'zaroth',
   ]
 
   $developers.each |String $developer| {

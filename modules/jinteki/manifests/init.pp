@@ -7,7 +7,7 @@ class jinteki {
   include jinteki::clojure
   include jinteki::game
   include jinteki::iptables
-  include jinteki::lighttpd
+  include jinteki::nginx
   include jinteki::mongodb
   include jinteki::nodejs
   include jinteki::scripts
@@ -15,7 +15,7 @@ class jinteki {
 
   Class[jinteki::users]
   -> Class[jinteki::iptables]
-  -> Class[jinteki::lighttpd]
+  -> Class[jinteki::nginx]
   -> Class[jinteki::nodejs]
   -> Class[jinteki::mongodb]
   -> Class[jinteki::clojure]

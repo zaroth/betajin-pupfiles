@@ -29,9 +29,11 @@ git pull origin dev &>> $LOG_FILE
 
 logmsg "Updating npm packages..."
 npm update &>> $LOG_FILE
+npm prune &>> $LOG_FILE
 
 logmsg "Updating bower packages..."
 bower update &>> $LOG_FILE
+bower prune &>> $LOG_FILE
 
 logmsg "Pulling new cards from NRDB..."
 coffee "data/fetch.coffee" &>> $LOG_FILE

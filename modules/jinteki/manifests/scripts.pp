@@ -1,5 +1,6 @@
 class jinteki::scripts {
   ensure_packages([
+    'cronie',
     'python',
   ])
 
@@ -16,5 +17,14 @@ class jinteki::scripts {
     hour => [0, 6, 12, 18],
     minute => 0,
     require => [File['/usr/local/bin/rebuild.sh']],
+    notify => Service['cronie'],
+  }
+
+  service {'cronie':
+    ensure => running,
+    enable => true,
+    hasstatus => true,
+    hasrestart => true,
+    require => Package['cronie'],
   }
 }

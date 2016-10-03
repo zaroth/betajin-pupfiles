@@ -21,6 +21,7 @@ function print_help {
   echo -e "    -h, --help - print this message and exit"
   echo -e "    -u, --update - update the dependencies instead of just making sure they're installed"
   echo -e "    -f, --full - force full recompilation even if the binaries and/or code seems up-to-date"
+  echo -e "    -k, --kill - if another rebuild is running in the background, don't stop, kill it instead"
 }
 
 full_rebuild=false

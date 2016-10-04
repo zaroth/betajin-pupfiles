@@ -28,7 +28,7 @@ full_rebuild=false
 kill_process=false
 update_deps=false
 
-while [[ $# -gt 1 ]]; do
+while [[ $# -ge 1 ]]; do
   case $1 in
     '-f'|'--full')
       full_rebuild=true
@@ -74,7 +74,9 @@ fi
 
 # from that point on we have to delete our own pidfile on exit
 function cleanup_pidfile {
-  rm $pidfile_path
+  if [ -f $pidfile_path ]; then
+    rm $pidfile_path
+  fi
 }
 
 echo $$ > $pidfile_path
@@ -82,17 +84,20 @@ trap cleanup_pidfile EXIT
 
 cd $repo_dir
 
-logmsg "Pulling fresh changes from GitHub..."
-git fetch &>> $log_file
+git fetch
 new_commits=`git rev-list HEAD...origin/dev --count`
 
 if (( $new_commits == 0 )) && [ "${full_rebuild}" != true ]; then
-  logmsg "No new commits in GitHub dev branch, exiting."
+  echo "No new commits in GitHub dev branch, exiting."
   exit 0
 fi
 
+# logmsg shouldn't be used above this line, to avoid spamming run-and-exit logs
+logmsg "Pulling fresh changes from GitHub..."
+
 git pull origin dev &>> $log_file
 logmsg "Current commit:"
+git log -1
 git log -1 &>> $log_file
 
 if [ "${update_deps}" = true ]; then
@@ -134,5 +139,4 @@ sudo systemctl restart jinteki-game.service
 
 let time_taken=(`date +%s`-$start_time)
 logmsg "Build finished at $(date) in ${time_taken} seconds"
-rm $pidfile_path
 exit 0

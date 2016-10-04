@@ -20,6 +20,15 @@ class jinteki::scripts {
     notify => Service['cronie'],
   }
 
+  # Clean up logs older than X days
+  cron {'clean-logdir':
+    command => "find ${jinteki::logdir} -mtime +30 -delete",
+    user => 'jinteki',
+    hour => 2,
+    minute => 0,
+    notify => Service['cronie'],
+  }
+
   service {'cronie':
     ensure => running,
     enable => true,

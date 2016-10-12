@@ -27,6 +27,7 @@ class jinteki::users {
 
   $developers = [
     'joel',
+    'neal',
     'saintis',
     'zaroth',
   ]

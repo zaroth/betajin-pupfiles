@@ -9,6 +9,7 @@ root_dir='/opt/jinteki'
 repo_dir="${root_dir}/netrunner"
 log_dir="${root_dir}/logs"
 pidfile_path="${root_dir}/rebuild.pid"
+export PATH="$PATH:/usr/local/bin"
 
 log_file="${log_dir}/$(date +%Y%m%d_%H%M)_build_log.txt"
 start_time=`date +%s`
@@ -133,7 +134,7 @@ lein cljsbuild once prod 2>&1 | stripcolors >> $log_file
 logmsg "Compiling Clojure..."
 lein uberjar &>> $log_file
 
-logmsg "Restarting servers..."
+logmsg "Restarting services..."
 sudo systemctl restart jinteki-site.service
 sudo systemctl restart jinteki-game.service
 

@@ -2,6 +2,7 @@ class jinteki::scripts {
   ensure_packages([
     'cronie',
     'python',
+    'syslog-ng',
   ])
 
   file {'/usr/local/bin/rebuild.sh':
@@ -35,5 +36,22 @@ class jinteki::scripts {
     hasstatus => true,
     hasrestart => true,
     require => Package['cronie'],
+  }
+
+  file {'/etc/syslog-ng/syslog-ng.conf':
+    content => epp('jinteki/syslog-ng.conf.epp'),
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+    require => Package['syslog-ng'],
+    notify => Service['syslog-ng'],
+  }
+  
+  service {'syslog-ng':
+    ensure => running,
+    enable => true,
+    hasstatus => true,
+    hasrestart => true,
+    require => [Package['syslog-ng'], File['/etc/syslog-ng/syslog-ng.conf']],
   }
 }

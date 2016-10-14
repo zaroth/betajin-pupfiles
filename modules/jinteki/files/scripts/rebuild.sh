@@ -96,43 +96,43 @@ fi
 # logmsg shouldn't be used above this line, to avoid spamming run-and-exit logs
 logmsg "Pulling fresh changes from GitHub..."
 
-git pull origin dev &>> $log_file
+git pull origin dev 2&>1 | tee -a $log_file
 logmsg "Current commit:"
 git log -1
-git log -1 &>> $log_file
+git log -1 2&>1 | tee -a $log_file
 
 if [ "${update_deps}" = true ]; then
   logmsg "Updating npm and bower packages..."
-  npm update &>> $log_file
-  bower update &>> $log_file
+  npm update 2>&1 | tee -a $log_file
+  bower update 2&>1 | tee -a $log_file
 else
   logmsg "Installing npm and bower packages..."
-  npm install &>> $log_file
-  bower install &>> $log_file
+  npm install 2>&1 | tee -a $log_file
+  bower install 2>&1 | tee -a $log_file
 fi
 # prune only for full rebuild
 if [ "${full_rebuild}" = true ]; then
   logmsg "Pruning npm and bower packages..."
-  npm prune &>> $log_file
-  bower prune &>> $log_file
+  npm prune 2>&1 | tee -a $log_file
+  bower prune 2>&1 | tee -a $log_file
 fi
 
 logmsg "Pulling new cards from NRDB..."
-coffee "data/fetch.coffee" &>> $log_file
+coffee "data/fetch.coffee" 2>&1 | tee -a $log_file
 
 if [ "${full_rebuild}" ]; then
   logmsg "Cleaning up previous build..."
-  lein clean &>> $log_file
+  lein clean 2>&1 | tee -a $log_file
 fi
 
 logmsg "Compiling Stylus files..."
-stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors >> $log_file
+stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors | tee -a $log_file
 
 logmsg "Compiling ClojureScript..."
-lein cljsbuild once prod 2>&1 | stripcolors >> $log_file
+lein cljsbuild once prod 2>&1 | stripcolors | tee -a $log_file
 
 logmsg "Compiling Clojure..."
-lein uberjar &>> $log_file
+lein uberjar 2&>1 | tee -a $log_file
 
 logmsg "Restarting services..."
 sudo systemctl restart jinteki-site.service

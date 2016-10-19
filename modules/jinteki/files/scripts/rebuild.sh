@@ -123,10 +123,10 @@ coffee "data/fetch.coffee" 2>&1 | tee -a $log_file
 if [ "${full_rebuild}" ]; then
   logmsg "Cleaning up previous build..."
   lein clean 2>&1 | tee -a $log_file
-fi
 
-logmsg "Compiling Stylus files..."
-stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors | tee -a $log_file
+  logmsg "Compiling Stylus files..."
+  stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors | tee -a $log_file
+fi
 
 logmsg "Compiling ClojureScript..."
 lein cljsbuild once prod 2>&1 | stripcolors | tee -a $log_file

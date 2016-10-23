@@ -16,8 +16,24 @@ http {
   charset utf-8;
 
   server {
-    listen 80 default_server;
-    server_name jinteki.zaroth.net ws.jinteki.zaroth.net ws.zaroth.net;
+    listen 80;
+    server_name ws.zaroth.net;
+    keepalive_timeout 90s;
+    location / {
+      proxy_pass http://127.0.0.1:1042;
+    }
+  }
+  server {
+    listen 80;
+    server_name ws.jinteki.zaroth.net;
+    keepalive_timeout 90s;
+    location / {
+      proxy_pass http://127.0.0.1:1042;
+    }
+  }
+  server {
+    listen 80;
+    server_name jinteki.zaroth.net;
     keepalive_timeout 90s;
     location / {
       proxy_pass http://127.0.0.1:1042;

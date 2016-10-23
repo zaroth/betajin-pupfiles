@@ -12,6 +12,9 @@ class jinteki {
   include jinteki::nodejs
   include jinteki::scripts
   include jinteki::users
+  include jinteki::letsencrypt_jinteki
+  include jinteki::letsencrypt_ws
+  include jinteki::letsencrypt_renew
 
   Class[jinteki::users]
   -> Class[jinteki::iptables]
@@ -21,4 +24,7 @@ class jinteki {
   -> Class[jinteki::clojure]
   -> Class[jinteki::game]
   -> Class[jinteki::scripts]
+  -> Class[jinteki::letsencrypt_jinteki]
+  -> Class[jinteki::letsencrypt_ws]
+  -> Class[jinteki::letsencrypt_renew]
 }

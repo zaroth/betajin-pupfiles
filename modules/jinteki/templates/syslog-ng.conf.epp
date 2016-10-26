@@ -25,8 +25,12 @@ source src_journald {
 destination d_jintekigame { file("<%= "${jinteki::logdir}" %>/${YEAR}${MONTH}${DAY}_game_log.txt"); };
 destination d_jintekisite { file("<%= "${jinteki::logdir}" %>/${YEAR}${MONTH}${DAY}_site_log.txt"); };
 
-filter f_jintekigame { "${.SDATA.journald.UNIT}" eq "jinteki-game.service" };
-filter f_jintekisite { "${.SDATA.journald.UNIT}" eq "jinteki-site.service" };
+filter f_jintekigame_u { "${.SDATA.journald.UNIT}" eq "jinteki-game.service" };
+filter f_jintekigame_su { "${.SDATA.journald._SYSTEMD_UNIT}" eq "jinteki-game.service" };
+filter f_jintekisite_u { "${.SDATA.journald.UNIT}" eq "jinteki-site.service" };
+filter f_jintekisite_su { "${.SDATA.journald._SYSTEMD_UNIT}" eq "jinteki-site.service" };
 
-log { source(src_journald); filter(f_jintekigame); destination(d_jintekigame); };
-log { source(src_journald); filter(f_jintekisite); destination(d_jintekisite); };
+log { source(src_journald); filter(f_jintekigame_u); destination(d_jintekigame); };
+log { source(src_journald); filter(f_jintekigame_su); destination(d_jintekigame); };
+log { source(src_journald); filter(f_jintekisite_u); destination(d_jintekisite); };
+log { source(src_journald); filter(f_jintekisite_su); destination(d_jintekisite); };

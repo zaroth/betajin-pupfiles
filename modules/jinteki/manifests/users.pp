@@ -30,7 +30,7 @@ class jinteki::users {
     'neal',
     'saintis',
     'zaroth',
-    'dom'
+    'dom',
   ]
 
   $developers.each |String $developer| {

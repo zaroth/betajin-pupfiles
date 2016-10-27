@@ -86,17 +86,17 @@ trap cleanup_pidfile EXIT
 cd $repo_dir
 
 git fetch
-new_commits=`git rev-list HEAD...origin/dev --count`
+new_commits=`git rev-list HEAD...origin/<%= $jinteki_remote_git_branch %> --count`
 
 if (( $new_commits == 0 )) && [ "${full_rebuild}" != true ]; then
-  echo "No new commits in GitHub dev branch, exiting."
+  echo "No new commits in GitHub <%= $jinteki_remote_git_branch %> branch, exiting."
   exit 0
 fi
 
 # logmsg shouldn't be used above this line, to avoid spamming run-and-exit logs
 logmsg "Pulling fresh changes from GitHub..."
 
-git pull origin dev 2>&1 | tee -a $log_file
+git pull origin <%= $jinteki_remote_git_branch %> 2>&1 | tee -a $log_file
 logmsg "Current commit:"
 git log -1 2>&1 | tee -a $log_file
 

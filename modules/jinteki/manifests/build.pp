@@ -13,7 +13,7 @@ class jinteki::build {
   }
 
   file {'/usr/local/bin/rebuild.sh':
-    source => 'puppet:///modules/jinteki/scripts/rebuild.sh',
+    content => epp('jinteki/scripts/rebuild.sh'),
     owner => 'root',
     group => 'root',
     mode => '0755',

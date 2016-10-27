@@ -98,7 +98,6 @@ logmsg "Pulling fresh changes from GitHub..."
 
 git pull origin dev 2>&1 | tee -a $log_file
 logmsg "Current commit:"
-git log -1
 git log -1 2>&1 | tee -a $log_file
 
 if [ "${update_deps}" = true ]; then

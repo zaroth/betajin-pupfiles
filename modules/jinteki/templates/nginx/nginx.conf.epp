@@ -15,14 +15,16 @@ http {
   gzip on;
   charset utf-8;
 
+<% $jinteki_domains.each |String $domain| { -%>
   server {
-    listen 80 default_server;
-    server_name jinteki.zaroth.net ws.jinteki.zaroth.net ws.zaroth.net;
+    listen 80;
+    server_name <%= $domain %>;
     keepalive_timeout 90s;
     location / {
       proxy_pass http://127.0.0.1:1042;
     }
   }
+<% } -%>
 
   server {
     listen 8080 default_server;

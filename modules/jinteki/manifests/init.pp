@@ -4,13 +4,14 @@ class jinteki {
   $repodir = "${jinteki::rootdir}/netrunner"
   $logdir = "${jinteki::rootdir}/logs"
 
+  include jinteki::build
+  include jinteki::certbot
   include jinteki::clojure
-  include jinteki::game
   include jinteki::iptables
   include jinteki::nginx
   include jinteki::mongodb
   include jinteki::nodejs
-  include jinteki::scripts
+  include jinteki::services
   include jinteki::users
 
   Class[jinteki::users]
@@ -19,6 +20,7 @@ class jinteki {
   -> Class[jinteki::nodejs]
   -> Class[jinteki::mongodb]
   -> Class[jinteki::clojure]
-  -> Class[jinteki::game]
-  -> Class[jinteki::scripts]
+  -> Class[jinteki::build]
+  -> Class[jinteki::services]
+  -> Class[jinteki::certbot]
 }

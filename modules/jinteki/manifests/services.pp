@@ -1,16 +1,9 @@
-class jinteki::scripts {
+class jinteki::services {
   ensure_packages([
     'cronie',
     'python',
     'syslog-ng',
   ])
-
-  file {'/usr/local/bin/rebuild.sh':
-    source => 'puppet:///modules/jinteki/scripts/rebuild.sh',
-    owner => 'root',
-    group => 'root',
-    mode => '0755',
-  }
 
   cron {'rebuild':
     command => '/usr/local/bin/rebuild.sh',
@@ -30,6 +23,36 @@ class jinteki::scripts {
     notify => Service['cronie'],
   }
 
+  file {'/etc/systemd/system/jinteki-game.service':
+    content => epp('jinteki/systemd/jinteki-game.service.epp'),
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+  }
+
+  service {'jinteki-game':
+    ensure => running,
+    enable => true,
+    hasrestart => true,
+    hasstatus => true,
+    require => File['/etc/systemd/system/jinteki-game.service'],
+  }
+
+  file {'/etc/systemd/system/jinteki-site.service':
+    content => epp('jinteki/systemd/jinteki-site.service.epp'),
+    owner => 'root',
+    group => 'root',
+    mode => '0644',
+  }
+
+  service {'jinteki-site':
+    ensure => running,
+    enable => true,
+    hasrestart => true,
+    hasstatus => true,
+    require => File['/etc/systemd/system/jinteki-site.service'],
+  }
+
   service {'cronie':
     ensure => running,
     enable => true,
@@ -46,7 +69,7 @@ class jinteki::scripts {
     require => Package['syslog-ng'],
     notify => Service['syslog-ng'],
   }
-  
+
   service {'syslog-ng':
     ensure => running,
     enable => true,

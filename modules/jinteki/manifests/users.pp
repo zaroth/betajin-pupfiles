@@ -25,14 +25,6 @@ class jinteki::users {
     require => [User['jinteki'], Group['jinteki']],
   }
 
-  $developers = [
-    'joel',
-    'neal',
-    'saintis',
-    'zaroth',
-    'dom',
-  ]
-
   $developers.each |String $developer| {
     user {$developer :
       ensure => present,

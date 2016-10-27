@@ -116,7 +116,7 @@ if [ "${full_rebuild}" = true ]; then
   bower prune 2>&1 | tee -a $log_file
 fi
 
-logmsg "Pulling new cards from NRDB..."
+logmsg "Fetching card data from NRDB..."
 coffee "data/fetch.coffee" 2>&1 | tee -a $log_file
 
 if [ "${full_rebuild}" ]; then

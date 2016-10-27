@@ -13,4 +13,11 @@ class jinteki::certbot {
     }
   }
 
+  cron {'certbot_renew':
+    ensure => 'present',
+    command => '/usr/bin/certbot renew --quiet --agree-tos',
+    user => 'root',
+    hour => 10,
+    minute => 42,
+  }
 }

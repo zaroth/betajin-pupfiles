@@ -8,6 +8,7 @@ $jinteki_remote_git_branch = 'dev'
 
 $developers = [
     'dom',
+    'erbridge',
     'joel',
     'neal',
     'saintis',

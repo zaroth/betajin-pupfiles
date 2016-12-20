@@ -23,6 +23,11 @@ function print_help {
   echo -e "    -u, --update - update the dependencies instead of just making sure they're installed"
   echo -e "    -f, --full - force full recompilation even if the binaries and/or code seems up-to-date"
   echo -e "    -k, --kill - if another rebuild is running in the background, don't stop, kill it instead"
+  echo -e "    -c, --custom - specify custom build steps, by default makes the script do nothing"
+  echo -e "  Available custom build steps (always executed in given order):"
+  echo -e "    --git-pull, --deps-install, --deps-prune, --cleanup, --stylus, --nrdb-fetch, --cljs-build,"
+  echo -e "    --clj-build, --restart"
+
 }
 
 full_rebuild=false
@@ -43,6 +48,36 @@ while [[ $# -ge 1 ]]; do
       ;;
     '-u'|'--update')
       update_deps=true
+      ;;
+    '-c'|'--custom')
+      custom_build=true
+      ;;
+    '--git-pull')
+      make_git_pull=true
+      ;;
+    '--deps-install')
+      make_deps_install=true
+      ;;
+    '--deps-prune')
+      make_deps_prune=true
+      ;;
+    '--cleanup')
+      make_cleanup=true
+      ;;
+    '--stylus')
+      make_stylus=true
+      ;;
+    '--nrdb-fetch')
+      make_nrdb_fetch=true
+      ;;
+    '--cljs-build')
+      make_cljs_build=true
+      ;;
+    '--clj-build')
+      make_clj_build=true
+      ;;
+    '--restart')
+      make_restart_services=true
       ;;
     *)
       break
@@ -80,62 +115,102 @@ function cleanup_pidfile {
   fi
 }
 
+function step_git_pull {
+  git fetch
+  new_commits=`git rev-list HEAD...origin/<%= $jinteki_remote_git_branch %> --count`
+
+  if (( $new_commits == 0 )) && [ "${full_rebuild}" != true ]; then
+    echo "No new commits in GitHub <%= $jinteki_remote_git_branch %> branch, exiting."
+    exit 0
+  fi
+
+  # logmsg shouldn't be used above this line, to avoid spamming run-and-exit logs
+  logmsg "Pulling fresh changes from GitHub..."
+
+  git pull origin <%= $jinteki_remote_git_branch %> 2>&1 | tee -a $log_file
+  logmsg "Current commit:"
+  git log -1 2>&1 | tee -a $log_file
+}
+
+function step_deps_install {
+  if [ "${update_deps}" = true ]; then
+    logmsg "Updating npm and bower packages..."
+    npm update 2>&1 | tee -a $log_file
+    bower update 2>&1 | tee -a $log_file
+  else
+    logmsg "Installing npm and bower packages..."
+    npm install 2>&1 | tee -a $log_file
+    bower install 2>&1 | tee -a $log_file
+  fi
+}
+
+function step_deps_prune {
+  logmsg "Pruning npm and bower packages..."
+  npm prune 2>&1 | tee -a $log_file
+  bower prune 2>&1 | tee -a $log_file
+}
+
+function step_nrdb_fetch {
+  logmsg "Fetching card data from NRDB..."
+  coffee "data/fetch.coffee" 2>&1 | tee -a $log_file
+}
+
+function step_cleanup {
+  logmsg "Cleaning up previous build..."
+  lein clean 2>&1 | tee -a $log_file
+}
+
+function step_stylus {
+  logmsg "Compiling Stylus files..."
+  stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors | tee -a $log_file
+}
+
+function step_cljs_build {
+  logmsg "Compiling ClojureScript..."
+  lein cljsbuild once prod 2>&1 | stripcolors | tee -a $log_file
+}
+
+function step_clj_build {
+  logmsg "Compiling Clojure..."
+  lein uberjar 2>&1 | tee -a $log_file
+}
+
+function step_restart_services {
+  logmsg "Restarting services..."
+  sudo systemctl restart jinteki-site.service
+  sudo systemctl restart jinteki-game.service
+}
+
+
+
 echo $$ > $pidfile_path
 trap cleanup_pidfile EXIT
 
 cd $repo_dir
 
-git fetch
-new_commits=`git rev-list HEAD...origin/<%= $jinteki_remote_git_branch %> --count`
-
-if (( $new_commits == 0 )) && [ "${full_rebuild}" != true ]; then
-  echo "No new commits in GitHub <%= $jinteki_remote_git_branch %> branch, exiting."
-  exit 0
-fi
-
-# logmsg shouldn't be used above this line, to avoid spamming run-and-exit logs
-logmsg "Pulling fresh changes from GitHub..."
-
-git pull origin <%= $jinteki_remote_git_branch %> 2>&1 | tee -a $log_file
-logmsg "Current commit:"
-git log -1 2>&1 | tee -a $log_file
-
-if [ "${update_deps}" = true ]; then
-  logmsg "Updating npm and bower packages..."
-  npm update 2>&1 | tee -a $log_file
-  bower update 2>&1 | tee -a $log_file
+if [ "${custom_build}" = true ]; then
+  if [ "${make_git_pull}" = true ]; then step_git_pull; fi
+  if [ "${make_deps_install}" = true ]; then step_deps_install; fi
+  if [ "${make_deps_prune}" = true ]; then step_deps_prune; fi
+  if [ "${make_cleanup}" = true ]; then step_cleanup; fi
+  if [ "${make_stylus}" = true ]; then step_stylus; fi
+  if [ "${make_nrdb_fetch}" = true ]; then step_nrdb_fetch; fi
+  if [ "${make_cljs_build}" = true ]; then step_cljs_build; fi
+  if [ "${make_clj_build}" = true ]; then step_clj_build; fi
+  if [ "${make_restart_services}" = true ]; then step_restart_services; fi
 else
-  logmsg "Installing npm and bower packages..."
-  npm install 2>&1 | tee -a $log_file
-  bower install 2>&1 | tee -a $log_file
+  step_git_pull
+  step_deps_install
+  if [ "${full_rebuild}" = true ]; then
+    step_deps_prune
+    step_cleanup
+    step_stylus
+  fi
+  step_nrdb_fetch
+  step_cljs_build
+  step_clj_build
+  step_restart_services
 fi
-# prune only for full rebuild
-if [ "${full_rebuild}" = true ]; then
-  logmsg "Pruning npm and bower packages..."
-  npm prune 2>&1 | tee -a $log_file
-  bower prune 2>&1 | tee -a $log_file
-fi
-
-logmsg "Fetching card data from NRDB..."
-coffee "data/fetch.coffee" 2>&1 | tee -a $log_file
-
-if [ "${full_rebuild}" ]; then
-  logmsg "Cleaning up previous build..."
-  lein clean 2>&1 | tee -a $log_file
-
-  logmsg "Compiling Stylus files..."
-  stylus src/css/ -o resources/public/css/ 2>&1 | stripcolors | tee -a $log_file
-fi
-
-logmsg "Compiling ClojureScript..."
-lein cljsbuild once prod 2>&1 | stripcolors | tee -a $log_file
-
-logmsg "Compiling Clojure..."
-lein uberjar 2>&1 | tee -a $log_file
-
-logmsg "Restarting services..."
-sudo systemctl restart jinteki-site.service
-sudo systemctl restart jinteki-game.service
 
 let time_taken=(`date +%s`-$start_time)
 logmsg "Build finished at $(date) in ${time_taken} seconds"

@@ -155,6 +155,8 @@ function step_nrdb_fetch {
   npm run fetch 2>&1 | tee -a $log_file
   npm run promo 2>&1 | tee -a $log_file
   npm run rotate core 2>&1 | tee -a $log_file
+  npm run rotate genesis 2>&1 | tee -a $log_file
+  npm run rotate spin 2>&1 | tee -a $log_file
   npm run link_cards 2>&1 | tee -a $log_file
   npm run add_art  2>&1 | tee -a $log_file
 }
